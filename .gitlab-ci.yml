@@ -1,5 +1,5 @@
 test:
-  image: elixir:1.7.4
+  image: elixir:latest
   script:
     - mix local.rebar --force
     - mix local.hex --force
