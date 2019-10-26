@@ -1,6 +1,6 @@
 FROM elixir:latest
 
-WORKDIR /
+WORKDIR /app
 
 ENV MIX_ENV prod
 
