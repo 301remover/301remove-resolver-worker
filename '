@@ -2,10 +2,8 @@ defmodule ResolverWorker.RPCServer do
   use Freddy.RPC.Server
   alias ResolverWorker.Resolve
 
-  require Logger
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
-  # TODO: Add additional queue names and routing keys for more shorteners in future sprints 
   def start_link(conn) do
     config = [
       exchange: [name: "301remover-resolver", type: :direct, opts: [durable: false]],
@@ -22,10 +20,10 @@ defmodule ResolverWorker.RPCServer do
   end
 
   @impl true
-  def handle_request(request, meta, state) do
-    {:ok, full} = Resolve.resolve(meta[:routing_key], request)
-    ack(meta)
-    {:reply, full, state}
+  def init(handler) do
+    {:ok, task_sup} = Task.Supervisor.start_link()
+
+    {:ok, {task_sup, handler}}
   end
 
   @impl true
