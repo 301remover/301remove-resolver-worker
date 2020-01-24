@@ -29,13 +29,16 @@ defmodule ResolverWorker.RPCServer do
   end
 
   @impl true
-  def handle_request(request, meta, {task_sup, handler} = state) do
-    Task.Supervisor.start_child(task_sup, fn ->
-      result = handler.(request)
-      ack(meta)
-      reply(meta, result)
-    end)
+  def handle_request(request, meta, state) do
+    case meta[:routing_key] do
+      :tiny ->
+        ResolverWorker.tinyurl(state, request)
 
-    {:noreply, state}
+      :bitly ->
+        ResolverWorker.bitly(state, request)
+
+      :google ->
+        ResolverWorker.google(state, request)
+    end
   end
 end
