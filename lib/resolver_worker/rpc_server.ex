@@ -2,6 +2,7 @@ defmodule ResolverWorker.RPCServer do
   use Freddy.RPC.Server
   alias ResolverWorker.Resolve
 
+  require Logger
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
   # TODO: Add additional queue names and routing keys for more shorteners in future sprints 
