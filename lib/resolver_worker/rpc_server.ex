@@ -1,16 +1,13 @@
-defmodule ResoverWorker.RpcServer do
+defmodule ResolverWorker.RPCServer do
   use Freddy.RPC.Server
-  alias ResolverWorker
-
-  require Logger
+  alias DatabaseWorker.Storage
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
-  def start_link(conn, handler) when is_function(handler, 1) do
+  def start_link(conn) do
     config = [
-      exchange: [name: "301remover", type: :direct, opts: [durable: false]],
-      # ["res_bit.ly", "res_tinyurl", "res_google"],
-      queue: [name: "res_bit.ly"],
+      exchange: [name: "301remover-resolver", type: :direct, opts: [durable: false]],
+      queue: [name: "bit.ly-resolver"],
       routing_keys: ["bit.ly"],
       binds: [[routing_key: "bit.ly"]],
       # this is protection from DoS
@@ -19,27 +16,18 @@ defmodule ResoverWorker.RpcServer do
       consumer: [no_ack: false]
     ]
 
-    Freddy.RPC.Server.start_link(__MODULE__, conn, config, handler)
+    Freddy.RPC.Server.start_link(__MODULE__, conn, config, [])
   end
 
   @impl true
+  def handle_request(_request, meta, state) do
+    ack(meta)
+    {:reply, "resolved url", state}
+  end
+
   def init(handler) do
     {:ok, task_sup} = Task.Supervisor.start_link()
 
     {:ok, {task_sup, handler}}
-  end
-
-  @impl true
-  def handle_request(request, meta, state) do
-    case meta[:routing_key] do
-      :tiny ->
-        ResolverWorker.tinyurl(state, request)
-
-      "bitly" ->
-        ResolverWorker.bitly(state, request)
-
-      :google ->
-        ResolverWorker.google(state, request)
-    end
   end
 end
