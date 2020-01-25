@@ -22,12 +22,6 @@ defmodule ResolverWorker.Resolve do
     GenServer.call(__MODULE__, {:google, url})
   end
 
-  defp get_loc(response) do
-    Enum.filter(response.headers, fn
-      {key, _} -> String.match?(key, ~r/\Alocation\z/i)
-    end)
-  end
-
   defp get_full(url) do
     url
     |> HTTPoison.get!()
@@ -77,7 +71,6 @@ defmodule ResolverWorker.Resolve do
   def handle_call({:google, code}, _from, state) do
     url = get_full("https://goo.gl/" <> code)
     {:reply, {:ok, url}, increment_time(state, :google)}
-  end
 
   # GenServer init stuff
 
