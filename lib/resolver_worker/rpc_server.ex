@@ -29,7 +29,6 @@ defmodule ResolverWorker.RPCServer do
     {:reply, full, state}
   end
 
-  @impl true
   def init(handler) do
     {:ok, task_sup} = Task.Supervisor.start_link()
 
