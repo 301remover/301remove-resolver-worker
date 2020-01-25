@@ -37,7 +37,7 @@ defmodule ResolverWorkerTest do
   end
 
   # Google Tests
-  
+
   test "Test google with Tumblr" do
     short = "2L1d"
     response = {:reply, :ok, "http://productiveblog.tumblr.com/"}

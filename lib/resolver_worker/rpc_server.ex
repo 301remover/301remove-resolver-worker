@@ -1,6 +1,6 @@
 defmodule ResolverWorker.RPCServer do
   use Freddy.RPC.Server
-  alias DatabaseWorker.Storage
+  alias ResolverWorker.Resolve
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
@@ -20,9 +20,13 @@ defmodule ResolverWorker.RPCServer do
   end
 
   @impl true
-  def handle_request(_request, meta, state) do
+  def handle_request(request, meta, state) do
+    IO.puts(meta[:routing_key])
+    {:ok, full} = Resolve.resolve(meta[:routing_key], request)
+    IO.puts(full)
+    IO.puts("The full url is: " <> full <> " from " <> request)
     ack(meta)
-    {:reply, "resolved url", state}
+    {:reply, full, state}
   end
 
   def init(handler) do
