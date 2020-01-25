@@ -6,9 +6,10 @@ defmodule ResolverWorker.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
+
     children = [
-      # Starts a worker by calling: ResolverWorker.Worker.start_link(arg)
-      # {ResolverWorker.Worker, arg}
+      worker(ResolverWorker.AmqpConnection, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
