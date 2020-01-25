@@ -9,8 +9,9 @@ defmodule ResoverWorker.RpcServer do
   def start_link(conn, handler) when is_function(handler, 1) do
     config = [
       exchange: [name: "301remover", type: :direct, opts: [durable: false]],
-      queue: [name: ["res_bit.ly", "res_tinyurl", "res_google"],
-      routing_keys: ["bit.ly", "tinyur", "google"],
+      # ["res_bit.ly", "res_tinyurl", "res_google"],
+      queue: [name: "res_bit.ly"],
+      routing_keys: ["bit.ly"],
       binds: [[routing_key: "bit.ly"]],
       # this is protection from DoS
       qos: [prefetch_count: 100],
@@ -34,7 +35,7 @@ defmodule ResoverWorker.RpcServer do
       :tiny ->
         ResolverWorker.tinyurl(state, request)
 
-      :bitly ->
+      "bitly" ->
         ResolverWorker.bitly(state, request)
 
       :google ->
