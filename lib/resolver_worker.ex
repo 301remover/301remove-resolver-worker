@@ -1,67 +1,65 @@
 defmodule ResolverWorker do
   use GenServer
 
-  @moduledoc """
-  Documentation for ResolverWorker.
-  """
+  #   @moduledoc """
+  #   Documentation for ResolverWorker.
+  #   """
+
+  #   def start_link(default) when is_list(default) do
+  #     GenServer.start_link(__MODULE__, default, name: __MODULE__)
+  #   end
+
+  #   def resolve("tinyurl.com", url) do
+  #     GenServer.call(__MODULE__, {:tiny, url})
+  #   end
+
+  #   def resolve("bit.ly", url) do
+  #     GenServer.call(__MODULE__, {:bitly, url})
+  #   end
+
+  #   def resolve("goo.gl", url) do
+  #     GenServer.call(__MODULE__, {:google, url})
+  #   end
 
   @doc """
+  Handles a call back for tinyurl, bit.ly and goo.gl links
   """
-
-  def get_loc(response) do
+  defp get_loc(response) do
     Enum.filter(response.headers, fn
       {key, _} -> String.match?(key, ~r/\Alocation\z/i)
     end)
   end
 
-  @doc """
-  Handles a call back for tinyurl and bit.ly links
-  """
-  def tinyurl(server_pid, url) do
-    GenServer.call(server_pid, {:tiny, url})
+  defp get_full(url) do
+    url
+    |> HTTPoison.get!()
+    |> get_loc
+    |> List.first()
+    |> elem(1)
   end
 
-  def bitly(server_pid, url) do
-    GenServer.call(server_pid, {:bitly, url})
-  end
-
-  def google(server_pid, url) do
-    GenServer.call(server_pid, {:google, url})
-  end
-
+  # @impl true
   def handle_call({:tiny, code}) do
-    short = "https://tinyurl.com/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, :ok, url}
+    url = get_full("https://tinyurl.com/" <> code)
+    {:reply, {:ok, url}}
   end
 
+  #  @impl true
   def handle_call({:bitly, code}) do
-    short = "https://bit.ly/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, :ok, url}
+    url = get_full("https://bit.ly/" <> code)
+    {:reply, {:ok, url}}
   end
 
+  #  @impl true
   def handle_call({:google, code}) do
-    short = "https://goo.gl/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, :ok, url}
+    url = get_full("https://goo.gl/" <> code)
+    {:reply, {:ok, url}}
   end
 
   # GenServer init stuff
-  def start_link() do
-    GenServer.start_link(__MODULE__, [])
-  end
 
-  def init(_) do
-    {:ok, 1}
+  # @impl true
+  def init(state \\ %{}) do
+    {:ok, state}
   end
 end

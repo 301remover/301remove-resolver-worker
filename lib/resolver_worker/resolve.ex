@@ -30,40 +30,36 @@ defmodule ResolverWorker.Resolve do
     end)
   end
 
-  @impl true
-  def handle_call({:tiny, code}, _from, env) do
-    short = "https://tinyurl.com/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, {:ok, url}, env}
+  defp get_full(url) do
+    url
+    |> HTTPoison.get!()
+    |> get_loc
+    |> List.first()
+    |> elem(1)
   end
 
   @impl true
-  def handle_call({:bitly, code}, _from, env) do
-    short = "https://bit.ly/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, {:ok, url}, env}
+  def handle_call({:tiny, code}, _from, state) do
+    url = get_full("https://tinyurl.com/" <> code)
+    {:reply, {:ok, url}, state}
   end
 
   @impl true
-  def handle_call({:google, code}, _from, env) do
-    short = "https://goo.gl/" <> code
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, {:ok, url}, env}
+  def handle_call({:bitly, code}, _from, state) do
+    url = get_full("https://bit.ly/" <> code)
+    {:reply, {:ok, url}, state}
+  end
+
+  @impl true
+  def handle_call({:google, code}, _from, state) do
+    url = get_full("https://goo.gl/" <> code)
+    {:reply, {:ok, url}, state}
   end
 
   # GenServer init stuff
 
   @impl true
-  def init(_) do
-    {:ok, 1}
+  def init(state \\ %{}) do
+    {:ok, state}
   end
 end
