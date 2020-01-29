@@ -1,5 +1,6 @@
 defmodule ResolverWorker do
   use GenServer
+
   @doc """
   Handles a call back for tinyurl, bit.ly and goo.gl links
   """
