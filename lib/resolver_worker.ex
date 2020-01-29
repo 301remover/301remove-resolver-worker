@@ -1,26 +1,5 @@
 defmodule ResolverWorker do
   use GenServer
-
-  #   @moduledoc """
-  #   Documentation for ResolverWorker.
-  #   """
-
-  #   def start_link(default) when is_list(default) do
-  #     GenServer.start_link(__MODULE__, default, name: __MODULE__)
-  #   end
-
-  #   def resolve("tinyurl.com", url) do
-  #     GenServer.call(__MODULE__, {:tiny, url})
-  #   end
-
-  #   def resolve("bit.ly", url) do
-  #     GenServer.call(__MODULE__, {:bitly, url})
-  #   end
-
-  #   def resolve("goo.gl", url) do
-  #     GenServer.call(__MODULE__, {:google, url})
-  #   end
-
   @doc """
   Handles a call back for tinyurl, bit.ly and goo.gl links
   """
