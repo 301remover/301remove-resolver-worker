@@ -36,6 +36,7 @@ defmodule ResolverWorker.Resolve do
     |> elem(1)
   end
 
+  # TODO: check for more uses than accepted rate and cut off queue for future sprint
   defp increment_time(state, shortener) do
     # if the state doesn't have shortener
     if !Map.has_key?(state, shortener) do
