@@ -4,6 +4,7 @@ defmodule ResolverWorker.RPCServer do
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
+  # TODO: Add additional queue names and routing keys for more shorteners in future sprints 
   def start_link(conn) do
     config = [
       exchange: [name: "301remover-resolver", type: :direct, opts: [durable: false]],
@@ -21,10 +22,7 @@ defmodule ResolverWorker.RPCServer do
 
   @impl true
   def handle_request(request, meta, state) do
-    IO.puts(meta[:routing_key])
     {:ok, full} = Resolve.resolve(meta[:routing_key], request)
-    IO.puts(full)
-    IO.puts("The full url is: " <> full <> " from " <> request)
     ack(meta)
     {:reply, full, state}
   end
