@@ -5,6 +5,10 @@ defmodule ResolverWorker do
   Documentation for ResolverWorker.
   """
 
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
   @doc """
   """
 
@@ -17,36 +21,38 @@ defmodule ResolverWorker do
   @doc """
   Handles a call back for tinyurl and bit.ly links
   """
-  def tinyurl(server_pid, url) do
-    GenServer.call(server_pid, {:tiny, url})
+  def resolve(shortener_domain, shortcode) do
+    GenServer.call(__MODULE__, {shortener_domain, shortcode})
   end
 
-  def bitly(server_pid, url) do
-    GenServer.call(server_pid, {:bitly, url})
+  defp get_full(url) do
+    url
+    |> HTTPoison.get!()
+    |> get_loc
+    |> List.first()
+    |> elem(1)
   end
 
-  def handle_call({:tiny, short}) do
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, :ok, url}
+  @impl true
+  def handle_call({"tinyurl.com", code}, _from, state) do
+    url = get_full("https://tinyurl.com/" <> code)
+    {:reply, {:ok, url}, state}
   end
 
-  def handle_call({:bitly, short}) do
-    response = HTTPoison.get!(short)
-    location = get_loc(response)
-    loc = List.first(location)
-    url = elem(loc, 1)
-    {:reply, :ok, url}
+  @impl true
+  def handle_call({"bit.ly", code}, _from, state) do
+    url = get_full("https://bit.ly/" <> code)
+    {:reply, {:ok, url}, state}
   end
 
-  # GenServer init stuff
-  def start_link() do
-    GenServer.start_link(__MODULE__, [])
+  @impl true
+  def handle_call({"goo.gl", code}, _from, state) do
+    url = get_full("https://goo.gl/" <> code)
+    {:reply, {:ok, url}, state}
   end
 
-  def init(_) do
-    {:ok, 1}
+  @impl true
+  def init(state \\ %{}) do
+    {:ok, state}
   end
 end
