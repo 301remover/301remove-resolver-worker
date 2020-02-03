@@ -2,37 +2,44 @@ defmodule ResolverWorkerTest do
   use ExUnit.Case
   doctest ResolverWorker
 
-  # Bit.ly Tests
-
-  test "test bitly with twitter" do
-    url = "bit.ly/b0003"
-    full = {:reply, :ok, "http://twitter.com/HansKee/statuses/4863319359"}
-    assert ResolverWorker.handle_call({:bitly, url}) == full
+  setup do
+    resolver = start_supervised!(ResolverWorker)
+    %{resolver: resolver}
   end
 
-  test "test bitly w/ trello" do
-    short = "bit.ly/1eyOBPE"
-    res = {:reply, :ok, "https://trello.com/"}
-    assert ResolverWorker.handle_call({:bitly, short}) == res
+  test "bit.ly valid link 1" do
+    shortcode = "b0003"
+    response = {:ok, "http://twitter.com/HansKee/statuses/4863319359"}
+    assert ResolverWorker.resolve("bit.ly", shortcode) == response
   end
 
-  test "test bitly w/ pentagram" do
-    short = "bit.ly/b0004"
-    response = {:reply, :ok, "http://www.pentagram.com/en/"}
-    assert ResolverWorker.handle_call({:bitly, short}) == response
+  test "bit.ly valid link 2" do
+    shortcode = "1eyOBPE"
+    response = {:ok, "https://trello.com/"}
+    assert ResolverWorker.resolve("bit.ly", shortcode) == response
   end
 
-  test "Test bit.ly with google" do
-    short = "bit.ly/ze6poY"
-    response = {:reply, :ok, "http://google.com/"}
-    assert ResolverWorker.handle_call({:bitly, short}) == response
+  test "bit.ly valid link 3" do
+    shortcode = "b0004"
+    response = {:ok, "http://www.pentagram.com/en/"}
+    assert ResolverWorker.resolve("bit.ly", shortcode) == response
   end
 
-  # TinyURL Tests
+  test "bit.ly valid link 4" do
+    shortcode = "ze6poY"
+    response = {:ok, "http://google.com/"}
+    assert ResolverWorker.resolve("bit.ly", shortcode) == response
+  end
 
-  test "Test tinyurl with youtube" do
-    short = "https://tinyurl.com/2fcpre6"
-    response = {:reply, :ok, "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
-    assert ResolverWorker.handle_call({:tiny, short}) == response
+  test "tinyurl.com valid link" do
+    shortcode = "2fcpre6"
+    response = {:ok, "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+    assert ResolverWorker.resolve("tinyurl.com", shortcode) == response
+  end
+
+  test "goo.gl valid link" do
+    shortcode = "2L1d"
+    response = {:ok, "http://productiveblog.tumblr.com/"}
+    assert ResolverWorker.resolve("goo.gl", shortcode) == response
   end
 end
