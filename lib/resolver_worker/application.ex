@@ -10,6 +10,7 @@ defmodule ResolverWorker.Application do
 
     children = [
       {ResolverWorker, []},
+      {ShortenerConfigClient, []},
       worker(ResolverWorker.AmqpConnection, [])
     ]
 
