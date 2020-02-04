@@ -3,12 +3,11 @@ defmodule ResolverWorker.RPCServer do
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
-  def start_link(conn) do
+  def start_link(conn, domain) do
     config = [
       exchange: [name: "301remover-resolver", type: :direct, opts: [durable: false]],
-      queue: [name: "bit.ly-resolver"],
-      routing_keys: ["bit.ly"],
-      binds: [[routing_key: "bit.ly"]],
+      queue: [name: domain <> "-resolver"],
+      routing_keys: [domain],
       # this is protection from DoS
       qos: [prefetch_count: 100],
       # this enables manual acknowledgements
@@ -19,8 +18,10 @@ defmodule ResolverWorker.RPCServer do
   end
 
   @impl true
-  def handle_request(_request, meta, state) do
+  def handle_request(shortcode, meta, state) do
+    domain = meta[:routing_key]
+    {:ok, resolved_url} = ResolverWorker.resolve(domain, shortcode)
     ack(meta)
-    {:reply, "resolved url", state}
+    {:reply, resolved_url, state}
   end
 end

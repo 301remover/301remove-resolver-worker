@@ -3,7 +3,7 @@ defmodule MockServer do
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
-  def start_link(conn) do
+  def start_link(conn, _domain) do
     config = [
       exchange: [name: "301remover-resolver", type: :direct, opts: [durable: false]],
       queue: [name: "throwaway"],

@@ -9,6 +9,7 @@ defmodule ResolverWorker.Application do
     import Supervisor.Spec
 
     children = [
+      {ResolverWorker, []},
       worker(ResolverWorker.AmqpConnection, [])
     ]
 

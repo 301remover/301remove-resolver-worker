@@ -2,11 +2,6 @@ defmodule ResolverWorkerTest do
   use ExUnit.Case
   doctest ResolverWorker
 
-  setup do
-    resolver = start_supervised!(ResolverWorker)
-    %{resolver: resolver}
-  end
-
   test "bit.ly valid link 1" do
     shortcode = "b0003"
     response = {:ok, "http://twitter.com/HansKee/statuses/4863319359"}
