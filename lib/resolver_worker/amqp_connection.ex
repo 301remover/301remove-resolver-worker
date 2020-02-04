@@ -17,5 +17,7 @@ defmodule ResolverWorker.AmqpConnection do
       end
 
     {:ok, _server} = start_server(conn, "bit.ly")
+    {:ok, _server} = start_server(conn, "goo.gl")
+    {:ok, _server} = start_server(conn, "tinyurl.com")
   end
 end
