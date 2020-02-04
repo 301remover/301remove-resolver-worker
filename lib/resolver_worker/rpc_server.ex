@@ -19,8 +19,10 @@ defmodule ResolverWorker.RPCServer do
   end
 
   @impl true
-  def handle_request(_request, meta, state) do
+  def handle_request(shortcode, meta, state) do
+    domain = meta[:routing_key]
+    {:ok, resolved_url} = ResolverWorker.resolve(domain, shortcode)
     ack(meta)
-    {:reply, "resolved url", state}
+    {:reply, resolved_url, state}
   end
 end
