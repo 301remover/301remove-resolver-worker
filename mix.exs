@@ -29,7 +29,8 @@ defmodule ResolverWorker.MixProject do
     [
       {:excoveralls, "~> 0.6", only: :test},
       {:freddy, "~> 0.15.0"},
-      {:httpoison, "~> 1.6"}
+      {:httpoison, "~> 1.6"},
+      {:jason, "~> 1.0"}
     ]
   end
 end
