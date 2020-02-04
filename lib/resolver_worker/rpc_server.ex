@@ -1,6 +1,5 @@
 defmodule ResolverWorker.RPCServer do
   use Freddy.RPC.Server
-  alias DatabaseWorker.Storage
 
   import Freddy.RPC.Server, only: [ack: 1, reply: 2]
 
