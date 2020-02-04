@@ -27,8 +27,8 @@ defmodule ResolverWorker.MixProject do
 
   defp deps do
     [
-      {:freddy, "~> 0.15.0"},
       {:excoveralls, "~> 0.6", only: :test},
+      {:freddy, "~> 0.15.0"},
       {:httpoison, "~> 1.6"}
     ]
   end
